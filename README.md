@@ -46,19 +46,19 @@ $ ./configure \
 
 Platform          | File 
 ----------------  | --------------------
-MacOS             | TODO
+MacOS             | [nginx-macos.tar.gz](https://github.com/gabihodoroaga/nginx-ntlm-module/releases/download/v1.19.3/nginx-macos.tar.gz)
 Linux             | TODO
-Windows           | TODO
+Windows           | [nginx-win64.zip](https://github.com/gabihodoroaga/nginx-ntlm-module/releases/download/v1.19.3/nginx-win64.zip)
 
 ## Acknowledgments
 
 - The upstream connection are not destroyed when the client connection si lost, instead the upstream connection will timeout eventually.
 - This module is using most of the code from the original nginx keepalive modules.
-- DO NOT USE THIS IN PRODUCTION. The [**Nginx Plus**](https://www.nginx.com/products/nginx/) has support for proxy 
+- DO NOT USE THIS IN PRODUCTION. The [**Nginx Plus**](https://www.nginx.com/products/nginx/) has support for NTLM. 
 
 ## Authors 
 
-* Gabriel Hodoroagqa ([hodo.dev](https://hodo.dev))
+* Gabriel Hodoroaga ([hodo.dev](https://hodo.dev))
 
 ## TODO
 
