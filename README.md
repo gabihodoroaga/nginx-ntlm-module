@@ -6,7 +6,7 @@ The NTLM module allows proxying requests with [NTLM Authentication](https://en.w
 
 > Syntax:  ntlm [connections];  
 > Default: ntlm 100;  
-> Context: upstream. 
+> Context: upstream 
 
 
 ```nginx
@@ -28,8 +28,8 @@ server {
 The connections parameter sets the maximum number of connections to the upstream servers that are preserved in the cache.
 
 > Syntax:  ntlm_timeout timeout;  
-> Default: ntlm_timeout 60s
-> Context: upstream. 
+> Default: ntlm_timeout 60s;  
+> Context: upstream  
 
 Sets the timeout during which an idle connection to an upstream server will stay open.
 
