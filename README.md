@@ -47,7 +47,7 @@ $ ./configure \
 Platform          | File 
 ----------------  | --------------------
 MacOS             | [nginx-macos.tar.gz](https://github.com/gabihodoroaga/nginx-ntlm-module/releases/download/v1.19.3/nginx-macos.tar.gz)
-Linux             | TODO
+Linux             | [nginx-linux.tar.gz](https://github.com/gabihodoroaga/nginx-ntlm-module/releases/download/v1.19.3/nginx-linux.tar.gz)
 Windows           | [nginx-win64.zip](https://github.com/gabihodoroaga/nginx-ntlm-module/releases/download/v1.19.3/nginx-win64.zip)
 
 ## Acknowledgments
