@@ -1,0 +1,14 @@
+{
+  "name": "nginx-upstream-backend-test",
+  "version": "1.0.0",
+  "description": "A simple backend to test the nginx ntlm functionality",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Gabriel Hodoroaga",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.17.1"
+  }
+}

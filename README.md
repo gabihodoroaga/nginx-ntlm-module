@@ -52,7 +52,6 @@ Windows           | [nginx-win64.zip](https://github.com/gabihodoroaga/nginx-ntl
 
 ## Acknowledgments
 
-- The upstream connection are not destroyed when the client connection si lost, instead the upstream connection will timeout eventually.
 - This module is using most of the code from the original nginx keepalive modules.
 - DO NOT USE THIS IN PRODUCTION. The [**Nginx Plus**](https://www.nginx.com/products/nginx/) has support for NTLM. 
 
@@ -62,6 +61,6 @@ Windows           | [nginx-win64.zip](https://github.com/gabihodoroaga/nginx-ntl
 
 ## TODO
 
-- Add tests
-- Add support for multiple workers
-- Drop the upstream connection when the client connection drops.
+[x] Add tests
+[x] Add support for multiple workers
+[x] Drop the upstream connection when the client connection drops.
