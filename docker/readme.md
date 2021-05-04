@@ -1,4 +1,4 @@
-# build the ntlm module using docker
+# Build using docker
 
 This document describes the steps to follow in order to build this modules using docker 
 
@@ -33,7 +33,7 @@ docker run --rm -it -p 8080:80 \
 # if the nginx stats without error yout a good to go
 ```
 
-## openresty alpine static
+## openresty alpine - static
 
 ```bash
 cd openresty/alpine/static
@@ -49,7 +49,7 @@ docker run --rm -it -p 8080:80 \
 # if the nginx stats without error yout a good to go
 ```
 
-## openresty alpine dynamic
+## openresty alpine - dynamic
 
 ```bash
 cd openresty/alpine/dynamic
