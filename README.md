@@ -38,22 +38,39 @@ Sets the timeout during which an idle connection to an upstream server will stay
 Follow the instructions from [Building nginx from Sources](http://nginx.org/en/docs/configure.html) and add the following line to the configure command
 
 ```bash 
-$ ./configure \
+./configure \
     --add-module=../nginx-ntlm-module
 ```
 
-## Releases 
+To build this as dynamic module run this command
 
-Platform          | File 
-----------------  | --------------------
-MacOS             | [nginx-macos.tar.gz](https://github.com/gabihodoroaga/nginx-ntlm-module/releases/download/v1.19.3/nginx-macos.tar.gz)
-Linux             | [nginx-linux.tar.gz](https://github.com/gabihodoroaga/nginx-ntlm-module/releases/download/v1.19.3/nginx-linux.tar.gz)
-Windows           | [nginx-win64.zip](https://github.com/gabihodoroaga/nginx-ntlm-module/releases/download/v1.19.3/nginx-win64.zip)
+```bash
+./configure \
+    --add-dynamic-module=../nginx-ntlm-module
+```
+
+## Tests
+
+In order to run the tests you need nodejs and perl installed on your system
+
+```bash
+# install the backend packages
+npm install -C t/backend
+
+# instal the test framework
+cpan Test::Nginx
+
+# set the path to your nginx location
+export PATH=/opt/local/nginx/sbin:$PATH
+
+prove -r t
+```
+
 
 ## Acknowledgments
 
-- This module is using most of the code from the original nginx keepalive modules.
-- DO NOT USE THIS IN PRODUCTION. The [**Nginx Plus**](https://www.nginx.com/products/nginx/) has support for NTLM. 
+- This module is using most of the code from the original nginx keepalive module.
+- DO NOT USE THIS IN PRODUCTION. [**Nginx Plus**](https://www.nginx.com/products/nginx/) has support for NTLM. 
 
 ## Authors 
 
@@ -61,6 +78,7 @@ Windows           | [nginx-win64.zip](https://github.com/gabihodoroaga/nginx-ntl
 
 ## TODO
 
-[x] Add tests
-[x] Add support for multiple workers
-[x] Drop the upstream connection when the client connection drops.
+- [x] Add tests
+- [x] Add support for multiple workers
+- [x] Drop the upstream connection when the client connection drops.
+- [ ] Add travis ci
