@@ -33,10 +33,14 @@ docker run --rm -it -p 8080:80 \
 # if the nginx stats without error yout a good to go
 ```
 
-## openresty alpine using the original build image
+## openresty alpine  - using official build image
 
 ```bash
-docker build -t openresty-ntlm -f alpine/Dockerfile --build-arg RESTY_CONFIG_OPTIONS_MORE="--add-module=../nginx-ntlm-module" --build-arg RESTY_EVAL_PRE_CONFIGURE="curl -L https://github.com/gabihodoroaga/nginx-ntlm-module/archive/refs/tags/v1.19.3-beta.1.tar.gz -o nginx-ntlm-module.tar.gz && tar -xvzf nginx-ntlm-module.tar.gz && mv nginx-ntlm-module-1.19.3-beta.1 nginx-ntlm-module" https://github.com/openresty/docker-openresty.git
+docker build -t openresty-ntlm \
+    -f alpine/Dockerfile \
+    --build-arg RESTY_CONFIG_OPTIONS_MORE="--add-module=../nginx-ntlm-module" \
+    --build-arg RESTY_EVAL_PRE_CONFIGURE="curl -L https://github.com/gabihodoroaga/nginx-ntlm-module/archive/refs/tags/v1.19.3-beta.1.tar.gz -o nginx-ntlm-module.tar.gz && tar -xvzf nginx-ntlm-module.tar.gz && mv nginx-ntlm-module-1.19.3-beta.1 nginx-ntlm-module" \
+    https://github.com/openresty/docker-openresty.git
 ```
 
 ## openresty alpine - static
