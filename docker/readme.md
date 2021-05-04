@@ -14,7 +14,7 @@ docker run --rm -it -p 8080:80 \
         -v $(PWD)/nginx.conf:/etc/nginx/nginx.conf \
         nginx-ntlm
 
-# if the nginx stats without error yout a good to go
+# if nginx starts without error you are good to go
 ```
 
 ## alpine - dynamic 
@@ -30,7 +30,7 @@ docker run --rm -it -p 8080:80 \
         -v $(PWD)/nginx.conf:/etc/nginx/nginx.conf \
         nginx-ntlm-dynamic
 
-# if the nginx stats without error yout a good to go
+# if nginx starts without error you are good to go
 ```
 
 ## openresty alpine  - using official build image
@@ -56,7 +56,7 @@ docker run --rm -it -p 8080:80 \
         -v $(PWD)/test/default.conf:/etc/nginx/conf.d/default.conf \
         openresty-ntlm
 
-# if the nginx stats without error yout a good to go
+# if nginx starts without error you are good to go
 ```
 
 ## openresty alpine - dynamic
@@ -73,6 +73,5 @@ docker run --rm -it -p 8080:80 \
         -v $(PWD)/test/nginx.conf:/usr/local/openresty/nginx/conf/nginx.conf \
         openresty-ntlm-dynamic
 
-# if the nginx stats without error yout a good to go
+# if nginx starts without error you are good to go
 ```
-
