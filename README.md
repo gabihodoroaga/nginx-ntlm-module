@@ -21,7 +21,7 @@ server {
 
     location /http/ {
         proxy_pass http://http_backend;
-        // next 2 settings are required for the keepalive to work properly
+        # next 2 settings are required for the keepalive to work properly
         proxy_http_version 1.1;
         proxy_set_header Connection "";
     }
