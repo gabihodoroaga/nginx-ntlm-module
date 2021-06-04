@@ -9,7 +9,7 @@ const KEEP_ALIVE = process.env.NGX_TEST_UPS_KEEP_ALIVE || 300_000
 // If the request contains the NTLM or Negotiate in the Authorization header
 // the value is saved into the connection object and is added as custom header
 // (X-NGX-NTLM-AUTH) for all subsequent request  
-var requestHander = (app, req, res) => {
+var requestHandler = (app, req, res) => {
     console.log(`[${app}] response received`);
     if (req.headers["authorization"]) {
         console.log(`[${app}] authorization header received`);
@@ -35,7 +35,7 @@ var requestHander = (app, req, res) => {
 
 const app1 = express();
 app1.get('/*', (req, res) => {
-    requestHander("app1", req,res);
+    requestHandler("app1", req,res);
 });
 var server1 = app1.listen(PORT1, () => {
     console.log(`[app1] upstream listening at http://localhost:${PORT1}`);
@@ -44,14 +44,14 @@ server1.keepAliveTimeout = KEEP_ALIVE;
 
 const app2 = express();
 app2.get('/*', (req, res) => {
-     requestHander("app2",req,res);
+     requestHandler("app2",req,res);
 });
 var server2 = app2.listen(PORT2, () => {
-    console.log(`[app1] upstream listening at http://localhost:${PORT2}`);
+    console.log(`[app2] upstream listening at http://localhost:${PORT2}`);
 });
 server2.keepAliveTimeout = KEEP_ALIVE;
 
-// Hack console log to pring data
+// Hack console log to print data
 var log = console.log;
 console.log = function () {
     var args = [].slice.call(arguments);
