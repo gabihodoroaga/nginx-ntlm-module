@@ -4,9 +4,9 @@ The NTLM module allows proxying requests with [NTLM Authentication](https://en.w
 
 ## How to use
 
-> Syntax:  ntlm [connections];  
-> Default: ntlm 100;  
-> Context: upstream 
+> Syntax:  ntlm [connections];
+> Default: ntlm 100;
+> Context: upstream
 
 
 ```nginx
@@ -30,17 +30,38 @@ server {
 
 The connections parameter sets the maximum number of connections to the upstream servers that are preserved in the cache.
 
-> Syntax:  ntlm_timeout timeout;  
-> Default: ntlm_timeout 60s;  
-> Context: upstream  
+> Syntax:  ntlm_timeout timeout;
+> Default: ntlm_timeout 60s;
+> Context: upstream
 
 Sets the timeout during which an idle connection to an upstream server will stay open.
 
-## Build 
+## Pre-built Packages (Ubuntu / Debian)
+
+Pre-built packages for this module are freely available from the GetPageSpeed repository:
+
+```bash
+# Install the repository keyring
+sudo install -d -m 0755 /etc/apt/keyrings
+curl -fsSL https://extras.getpagespeed.com/deb-archive-keyring.gpg \
+  | sudo tee /etc/apt/keyrings/getpagespeed.gpg >/dev/null
+
+# Add the repository (Ubuntu example - replace 'ubuntu' and 'jammy' for your distro)
+echo "deb [signed-by=/etc/apt/keyrings/getpagespeed.gpg] https://extras.getpagespeed.com/ubuntu jammy main" \
+  | sudo tee /etc/apt/sources.list.d/getpagespeed-extras.list
+
+# Install nginx and the module
+sudo apt-get update
+sudo apt-get install nginx nginx-module-ntlm
+```
+
+The module is automatically enabled after installation. Supported distributions include Debian 12/13 and Ubuntu 20.04/22.04/24.04 (both amd64 and arm64). See [the complete setup instructions](https://apt-nginx-extras.getpagespeed.com/apt-setup/).
+
+## Build
 
 Follow the instructions from [Building nginx from Sources](http://nginx.org/en/docs/configure.html) and add the following line to the configure command
 
-```bash 
+```bash
 ./configure \
     --add-module=../nginx-ntlm-module
 ```
@@ -73,9 +94,9 @@ prove -r t
 ## Acknowledgments
 
 - This module is using most of the code from the original nginx keepalive module.
-- DO NOT USE THIS IN PRODUCTION. [**Nginx Plus**](https://www.nginx.com/products/nginx/) has support for NTLM. 
+- DO NOT USE THIS IN PRODUCTION. [**Nginx Plus**](https://www.nginx.com/products/nginx/) has support for NTLM.
 
-## Authors 
+## Authors
 
 * Gabriel Hodoroaga ([hodo.dev](https://hodo.dev))
 
