@@ -43,6 +43,14 @@ typedef struct {
     ngx_connection_t *client_connection;
 } ngx_http_upstream_ntlm_cache_t;
 
+/* Fix: the client pool cleanup remembers the client connection and the
+ * upstream it is bound to, not a cache item. Cache items get reused for other
+ * clients, so a pointer to an item goes stale once the item is handed out. */
+typedef struct {
+    ngx_http_upstream_ntlm_srv_conf_t *conf;
+    ngx_connection_t *client_connection;
+} ngx_http_upstream_ntlm_client_cleanup_t;
+
 typedef struct {
     ngx_http_upstream_ntlm_srv_conf_t *conf;
     ngx_http_upstream_t *upstream;
@@ -228,6 +236,13 @@ static ngx_int_t ngx_http_upstream_get_ntlm_peer(ngx_peer_connection_t *pc,
             c = item->peer_connection;
             ngx_queue_remove(q);
             ngx_queue_insert_head(&hndp->conf->free, q);
+
+            /* Fix: the item no longer owns the connection. Without this
+             * the client cleanup later acts on a connection that is in use
+             * or already freed (posted event on fd -1 -> SIGSEGV). */
+            item->peer_connection = NULL;
+            item->client_connection = NULL;
+
             hndp->cached = 1;
             goto found;
         }
@@ -267,7 +282,7 @@ static void ngx_http_upstream_free_ntlm_peer(ngx_peer_connection_t *pc,
     ngx_connection_t *c;
     ngx_http_upstream_t *u;
     ngx_pool_cleanup_t *cln;
-    ngx_http_upstream_ntlm_cache_t *cleanup_item = NULL;
+    ngx_http_upstream_ntlm_client_cleanup_t *ccd = NULL;
 
     /* cache valid connections */
 
@@ -323,21 +338,27 @@ static void ngx_http_upstream_free_ntlm_peer(ngx_peer_connection_t *pc,
         "ntlm free peer saving item client_connection %p, pear connection %p",
         item->client_connection, c);
 
-    // create the client connection drop down handler
+    // create the client connection drop down handler (once per client and upstream)
     for (cln = item->client_connection->pool->cleanup; cln; cln = cln->next) {
         if (cln->handler == ngx_http_upstream_client_conn_cleanup) {
-            cleanup_item = cln->data;
-            break;
+            ccd = cln->data;
+            if (ccd->conf == hndp->conf) {
+                break;
+            }
+            ccd = NULL;
         }
     }
-    if (cleanup_item == NULL) {
-        cln = ngx_pool_cleanup_add(item->client_connection->pool, 0);
+    if (ccd == NULL) {
+        cln = ngx_pool_cleanup_add(item->client_connection->pool,
+                                   sizeof(ngx_http_upstream_ntlm_client_cleanup_t));
         if (cln == NULL) {
-            ngx_log_debug0(NGX_LOG_DEBUG_HTTP, pc->log, 0,
-                           "ntlm free peer ngx_pool_cleanup_add returned null");
+            ngx_log_error(NGX_LOG_ALERT, pc->log, 0,
+                          "ntlm free peer ngx_pool_cleanup_add returned null");
         } else {
+            ccd = cln->data;
+            ccd->conf = hndp->conf;
+            ccd->client_connection = item->client_connection;
             cln->handler = ngx_http_upstream_client_conn_cleanup;
-            cln->data = item;
         }
     }
 
@@ -369,21 +390,41 @@ invalid:
 }
 
 static void ngx_http_upstream_client_conn_cleanup(void *data) {
-    ngx_http_upstream_ntlm_cache_t *item = data;
-    
-    ngx_log_debug2(
-        NGX_LOG_DEBUG_HTTP, ngx_cycle->log, 0,
-        "ntlm client connection closed %p, droping peer connection %p",
-        item->client_connection, item->peer_connection);
+    ngx_http_upstream_ntlm_client_cleanup_t *ccd = data;
+    ngx_http_upstream_ntlm_cache_t *item;
+    ngx_queue_t *q, *next, *cache;
+    ngx_connection_t *c;
 
-    // Check if the item was removed previously from the queue (backend drop)
-    if (item->peer_connection != NULL) {
+    /* Fix: close only cached connections that still belong to this
+     * client, and close them right here instead of posting an event. A posted
+     * event outlives the connection it points to, and while it waits the
+     * client connection slot can already be reused by another client. */
 
-        item->peer_connection->read->timedout = 1;
-        ngx_post_event(item->peer_connection->read,&ngx_posted_events);
+    cache = &ccd->conf->cache;
 
-        ngx_queue_remove(&item->queue);
-        ngx_queue_insert_head(&item->conf->free, &item->queue);
+    for (q = ngx_queue_head(cache); q != ngx_queue_sentinel(cache); q = next) {
+        next = ngx_queue_next(q);
+        item = ngx_queue_data(q, ngx_http_upstream_ntlm_cache_t, queue);
+
+        if (item->client_connection != ccd->client_connection) {
+            continue;
+        }
+
+        c = item->peer_connection;
+
+        ngx_log_debug2(
+            NGX_LOG_DEBUG_HTTP, ngx_cycle->log, 0,
+            "ntlm client connection closed %p, dropping peer connection %p",
+            ccd->client_connection, c);
+
+        item->peer_connection = NULL;
+        item->client_connection = NULL;
+        ngx_queue_remove(q);
+        ngx_queue_insert_head(&ccd->conf->free, q);
+
+        if (c != NULL) {
+            ngx_http_upstream_ntlm_close(c);
+        }
     }
 }
 
@@ -424,11 +465,19 @@ close:
                    c->read->timedout);
 
     item = c->data;
+
+    /* Fix: touch the queue only if the item still owns this connection */
+    if (item == NULL || item->peer_connection != c) {
+        ngx_http_upstream_ntlm_close(c);
+        return;
+    }
+
     conf = item->conf;
-   
+
     // set the item peer connection to null to make sure we don't close it again
     // when the client connection cleanup is triggered
     item->peer_connection = NULL;
+    item->client_connection = NULL;
     ngx_http_upstream_ntlm_close(c);
 
     ngx_queue_remove(&item->queue);
